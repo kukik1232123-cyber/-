@@ -565,8 +565,9 @@ function saveOrder(){var u=sess(),r=calc(),o=ld("mp_orders",[]),m=me(),l=(m&&m.a
 (async function(){try{if(!users){users=[{id:"admin",name:"관리자",ph:"",pw:await hash("admin1234"),role:"admin"}];sv("mp_users",users)}}catch(e){users=null}renderAuth()})();
 </script>
 </body>
-  <script type="module">
+ <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.x.x/firebase-app.js";
+  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.x.x/firebase-auth.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyBs_m8m0NPuZuKjCy-NipTTOAYcv0HQTm0",
@@ -579,6 +580,97 @@ function saveOrder(){var u=sess(),r=calc(),o=ld("mp_orders",[]),m=me(),l=(m&&m.a
   };
 
   const app = initializeApp(firebaseConfig);
-  console.log("파이어베이스 연결 완료!");
+  const auth = getAuth(app);
+  console.log("파이어베이스 연결 및 인증 모듈 로드 완료!");
+
+  // 1. 회원가입 함수 (이메일 인증 메일 발송 + 자동 로그아웃)
+  window.handleRegister = function(email, password) {
+    createUserWithEmailAndPassword(auth, email, password)
+      .then((userCredential) => {
+        const user = userCredential.user;
+        sendEmailVerification(user)
+          .then(() => {
+            alert("인증 메일이 발송되었습니다! 메일함을 확인하여 인증을 완료해주세요.");
+            signOut(auth); // 인증 전이므로 바로 로그아웃 처리
+            location.reload();
+          });
+      })
+      .catch((error) => {
+        alert("회원가입 실패: " + error.message);
+      });
+  };
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.x.x/firebase-app.js";
+  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification, signOut } from "https://www.gstatic.com/firebasejs/10.x.x/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBs_m8m0NPuZuKjCy-NipTTOAYcv0HQTm0",
+    authDomain: "science-e12f0.firebaseapp.com",
+    projectId: "science-e12f0",
+    storageBucket: "science-e12f0.firebasestorage.app",
+    messagingSenderId: "285444511032",
+    appId: "1:285444511032:web:51a57ec68f2dc17cb59dcd",
+    measurementId: "G-Q6ZQK1QV8N"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  console.log("파이어베이스 연결 및 인증 모듈 로드 완료!");
+
+  // 1. 회원가입 함수
+  function handleRegister(email, password) {
+    createUserWithEmailAndPassword(auth, email, password)
+      .then((userCredential) => {
+        const user = userCredential.user;
+        sendEmailVerification(user)
+          .then(() => {
+            alert("인증 메일이 발송되었습니다! 메일함을 확인하여 인증을 완료해주세요.");
+            signOut(auth);
+            location.reload();
+          });
+      })
+      .catch((error) => {
+        alert("회원가입 실패: " + error.message);
+      });
+  }
+
+  // 2. 로그인 함수
+  function handleLogin(email, password) {
+    signInWithEmailAndPassword(auth, email, password)
+      .then((userCredential) => {
+        const user = userCredential.user;
+        
+        if (!user.emailVerified) {
+          alert("이메일 인증이 아직 완료되지 않았습니다. 메일함을 확인해주세요!");
+          signOut(auth);
+          return;
+        }
+        
+        alert("환영합니다! 로그인되었습니다.");
+        location.reload();
+      })
+      .catch((error) => {
+        alert("로그인 실패: 이메일이나 비밀번호를 다시 확인해주세요.");
+      });
+  }
+
+  // 3. 웹사이트의 로그인/가입 버튼(aGo)과 파이어베이스 함수 연결하기
+  document.getElementById("aGo").addEventListener("click", function() {
+    // 팝업창에서 입력한 이메일과 비밀번호 가져오기 (아이디 칸을 이메일로 사용)
+    const email = document.getElementById("aId").value.trim();
+    const password = document.getElementById("aPw").value;
+
+    if (!email || !password) {
+      alert("이메일과 비밀번호를 모두 입력해주세요.");
+      return;
+    }
+
+    // mode가 'L'이면 로그인, 아니면 회원가입
+    if (typeof mode !== 'undefined' && mode === 'L') {
+      handleLogin(email, password);
+    } else {
+      handleRegister(email, password);
+    }
+  });
 </script>
-</html>
