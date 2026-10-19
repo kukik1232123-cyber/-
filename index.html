@@ -565,4 +565,20 @@ function saveOrder(){var u=sess(),r=calc(),o=ld("mp_orders",[]),m=me(),l=(m&&m.a
 (async function(){try{if(!users){users=[{id:"admin",name:"관리자",ph:"",pw:await hash("admin1234"),role:"admin"}];sv("mp_users",users)}}catch(e){users=null}renderAuth()})();
 </script>
 </body>
+  <script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.x.x/firebase-app.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBs_m8m0NPuZuKjCy-NipTTOAYcv0HQTm0",
+    authDomain: "science-e12f0.firebaseapp.com",
+    projectId: "science-e12f0",
+    storageBucket: "science-e12f0.firebasestorage.app",
+    messagingSenderId: "285444511032",
+    appId: "1:285444511032:web:51a57ec68f2dc17cb59dcd",
+    measurementId: "G-Q6ZQK1QV8N"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  console.log("파이어베이스 연결 완료!");
+</script>
 </html>
